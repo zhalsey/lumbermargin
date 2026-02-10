@@ -1,0 +1,19 @@
+{
+  "name": "Lumber Margin",
+  "short_name": "LumberMargin",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#228B22",
+  "background_color": "#d8dce2",
+  "display": "standalone"
+}
