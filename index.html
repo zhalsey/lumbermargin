@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lumber Margin — Margin Calculator for Lumber Sales</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-chrome: linear-gradient(170deg, #e8eaef 0%, #c8cdd5 40%, #b8bec8 100%);
+    --bg-card: #eceef2;
+    --bg-card-border: #c0c5cf;
+    --bg-input: #ffffff;
+    --border: #b5bac5;
+    --border-highlight: #9ba1ad;
+    --text-primary: #1a1d24;
+    --text-secondary: #4a5060;
+    --text-muted: #7a8090;
+    --accent: #228B22;
+    --accent-glow: rgba(34, 139, 34, 0.12);
+    --accent-bright: #2a9e2a;
+    --green: #1a8a52;
+    --green-bright: #1d9e5c;
+    --slider-track: #c0c5cf;
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.05);
+    --shadow-inset: inset 0 1px 3px rgba(0,0,0,0.08);
+    --radius: 10px;
+    --radius-lg: 14px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--bg-chrome);
+    color: var(--text-primary);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 100% 80% at 30% -10%, rgba(255,255,255,0.5) 0%, transparent 50%),
+      radial-gradient(ellipse 60% 50% at 80% 110%, rgba(255,255,255,0.15) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 540px;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 14px;
+  }
+
+  .logo-text {
+    font-size: 34px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: #0d0f13;
+    line-height: 1.15;
+  }
+
+  .subtitle {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+    letter-spacing: 0.2px;
+    margin-top: 2px;
+  }
+
+  /* Cards */
+  .card {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-md);
+  }
+
+  .card-title {
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 16px;
+    background: var(--accent);
+    border-radius: 2px;
+  }
+
+  /* Inputs */
+  .input-row {
+    display: flex;
+    gap: 14px;
+  }
+
+  .input-group {
+    flex: 1;
+  }
+
+  .input-label {
+    display: block;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  .input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-prefix {
+    position: absolute;
+    left: 14px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: color 0.2s;
+  }
+
+  .input-suffix {
+    position: absolute;
+    right: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-muted);
+    pointer-events: none;
+    letter-spacing: 0.5px;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    background: var(--bg-input);
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 12px 65px 12px 34px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--text-primary);
+    outline: none;
+    box-shadow: var(--shadow-inset);
+    transition: all 0.2s ease;
+  }
+
+  input[type="text"]:focus {
+    border-color: var(--accent);
+    box-shadow: var(--shadow-inset), 0 0 0 3px var(--accent-glow);
+  }
+
+  input[type="text"]:focus ~ .input-prefix {
+    color: var(--accent);
+  }
+
+  input[type="text"]::placeholder {
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 20px;
+  }
+
+  /* Slider */
+  .slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+
+  .margin-value-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent-bright);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .slider-container {
+    padding: 6px 0;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 10px;
+    border-radius: 5px;
+    background: var(--slider-track);
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3aad3a, var(--accent));
+    cursor: grab;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(34,139,34,0.3), 0 0 0 1px rgba(34,139,34,0.15);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.12);
+    box-shadow: 0 2px 12px rgba(34,139,34,0.45), 0 0 0 1px rgba(34,139,34,0.2);
+  }
+
+  input[type="range"]::-webkit-slider-thumb:active {
+    cursor: grabbing;
+    transform: scale(1.05);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #3aad3a, var(--accent));
+    cursor: grab;
+    border: 3px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(34,139,34,0.3);
+  }
+
+  .slider-ticks {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px 2px 0;
+  }
+
+  .slider-tick {
+    font-size: 13px;
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--text-muted);
+    font-weight: 400;
+    cursor: pointer;
+    transition: color 0.2s;
+    user-select: none;
+  }
+
+  .slider-tick:hover { color: var(--text-primary); }
+
+  .presets {
+    display: flex;
+    gap: 7px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+  }
+
+  .preset-btn {
+    padding: 7px 13px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: #ffffff;
+    color: var(--text-secondary);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    transition: all 0.2s ease;
+  }
+
+  .preset-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+  }
+
+  .preset-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: var(--accent-glow);
+    box-shadow: 0 0 0 1px var(--accent-glow);
+  }
+
+  /* Results */
+  .results-card {
+    background: var(--bg-card);
+    border: 1px solid var(--bg-card-border);
+    border-radius: var(--radius-lg);
+    padding: 18px 22px;
+    margin-bottom: 10px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+  }
+
+  .results-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--green), var(--accent));
+    opacity: 0.6;
+  }
+
+  .result-main {
+    text-align: center;
+    padding: 8px 0 16px;
+  }
+
+  .result-label {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .result-price {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 56px;
+    font-weight: 700;
+    color: var(--green-bright);
+    letter-spacing: -2px;
+    line-height: 1;
+    transition: all 0.3s ease;
+  }
+
+  .result-price.empty {
+    color: var(--text-muted);
+    font-size: 44px;
+  }
+
+  .result-price .unit {
+    font-size: 22px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    letter-spacing: 0px;
+  }
+
+  /* Breakdown */
+  .breakdown {
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .breakdown-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .breakdown-label {
+    font-size: 16px;
+    color: var(--text-secondary);
+    font-weight: 400;
+  }
+
+  .breakdown-value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .breakdown-divider {
+    border: none;
+    border-top: 1px dashed var(--border);
+    margin: 2px 0;
+  }
+
+  .breakdown-row.total .breakdown-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 17px;
+  }
+
+  .breakdown-row.margin-amount .breakdown-value {
+    color: var(--accent-bright);
+  }
+
+  .breakdown-row.total .breakdown-value {
+    color: var(--green-bright);
+    font-size: 19px;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 8px;
+  }
+
+  .footer-text {
+    font-size: 13px;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+  }
+
+  /* Animations */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .card, .results-card {
+    animation: fadeInUp 0.4s ease-out both;
+  }
+  .results-card { animation-delay: 0.08s; }
+
+  /* ===== MOBILE: fit everything on screen ===== */
+  @media (max-width: 500px) {
+    body {
+      padding: 10px 10px;
+      justify-content: flex-start;
+      padding-top: max(10px, env(safe-area-inset-top));
+    }
+
+    .header { margin-bottom: 10px; }
+    .logo-text { font-size: 28px; }
+    .subtitle { font-size: 14px; }
+
+    .card, .results-card {
+      padding: 14px 16px;
+      margin-bottom: 8px;
+      border-radius: 12px;
+    }
+
+    .card-title {
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .input-row { gap: 10px; }
+
+    .input-label { font-size: 14px; margin-bottom: 4px; }
+
+    input[type="text"] {
+      font-size: 22px;
+      padding: 10px 58px 10px 30px;
+    }
+
+    .input-prefix { font-size: 18px; }
+    .input-suffix { font-size: 12px; }
+
+    .slider-header { margin-bottom: 8px; }
+    .margin-value-display { font-size: 30px; }
+
+    input[type="range"] { height: 10px; }
+    input[type="range"]::-webkit-slider-thumb { width: 34px; height: 34px; }
+
+    .slider-ticks { padding: 4px 2px 0; }
+    .slider-tick { font-size: 12px; }
+
+    .presets { gap: 6px; margin-top: 10px; }
+    .preset-btn { padding: 7px 11px; font-size: 13px; }
+
+    .result-main { padding: 6px 0 12px; }
+    .result-label { font-size: 12px; margin-bottom: 4px; }
+    .result-price { font-size: 46px; }
+    .result-price.empty { font-size: 36px; }
+    .result-price .unit { font-size: 18px; }
+
+    .breakdown { padding-top: 10px; gap: 6px; }
+    .breakdown-label { font-size: 14px; }
+    .breakdown-value { font-size: 15px; }
+    .breakdown-row.total .breakdown-label { font-size: 15px; }
+    .breakdown-row.total .breakdown-value { font-size: 17px; }
+    .breakdown-divider { margin: 1px 0; }
+
+    .footer { padding-top: 6px; }
+    .footer-text { font-size: 11px; }
+  }
+
+  /* ===== VERY SHORT PHONES (iPhone SE etc) ===== */
+  @media (max-height: 670px) and (max-width: 500px) {
+    .header { margin-bottom: 6px; }
+    .logo-text { font-size: 24px; }
+    .subtitle { font-size: 12px; }
+
+    .card, .results-card {
+      padding: 10px 14px;
+      margin-bottom: 6px;
+    }
+
+    .card-title { font-size: 11px; margin-bottom: 8px; }
+    .input-label { font-size: 13px; }
+    input[type="text"] { font-size: 20px; padding: 8px 55px 8px 28px; }
+
+    .margin-value-display { font-size: 26px; }
+    .slider-header { margin-bottom: 6px; }
+    .presets { margin-top: 8px; }
+    .preset-btn { padding: 5px 9px; font-size: 12px; }
+
+    .result-main { padding: 4px 0 10px; }
+    .result-price { font-size: 40px; }
+    .result-price .unit { font-size: 16px; }
+
+    .breakdown { padding-top: 8px; gap: 4px; }
+    .breakdown-label { font-size: 13px; }
+    .breakdown-value { font-size: 14px; }
+  }
+
+  /* ===== DESKTOP / LARGE SCREENS ===== */
+  @media (min-width: 501px) and (min-height: 800px) {
+    .container { max-width: 560px; }
+
+    .header { margin-bottom: 20px; }
+    .logo-text { font-size: 38px; }
+    .subtitle { font-size: 17px; }
+
+    .card, .results-card { padding: 22px 26px; margin-bottom: 14px; }
+
+    input[type="text"] { font-size: 26px; padding: 14px 70px 14px 36px; }
+    .input-prefix { font-size: 22px; }
+    .input-suffix { font-size: 15px; }
+    .input-label { font-size: 16px; }
+
+    .margin-value-display { font-size: 40px; }
+    .preset-btn { padding: 8px 16px; font-size: 15px; }
+
+    .result-price { font-size: 62px; }
+    .result-price .unit { font-size: 24px; }
+
+    .breakdown-label { font-size: 17px; }
+    .breakdown-value { font-size: 18px; }
+    .breakdown-row.total .breakdown-value { font-size: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo-text">Lumber Margin</div>
+    <div class="subtitle">Margin Calculator for Lumber Sales</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Cost Inputs</div>
+    <div class="input-row">
+      <div class="input-group">
+        <label class="input-label" for="costInput">Cost per MBF</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="text" id="costInput" placeholder="0" inputmode="decimal" value="4000">
+          <span class="input-suffix">/MBF</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label class="input-label" for="freightInput">Freight Estimate</label>
+        <div class="input-wrapper">
+          <span class="input-prefix">$</span>
+          <input type="text" id="freightInput" placeholder="0" inputmode="decimal" value="300">
+          <span class="input-suffix">/MBF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Margin</div>
+    <div class="slider-section">
+      <div class="slider-header">
+        <label class="input-label" for="marginSlider" style="margin-bottom:0">Target Margin</label>
+        <div class="margin-value-display" id="marginDisplay">8%</div>
+      </div>
+      <div class="slider-container">
+        <input type="range" id="marginSlider" min="0" max="50" step="0.5" value="8">
+      </div>
+      <div class="slider-ticks">
+        <span class="slider-tick" data-val="0">0%</span>
+        <span class="slider-tick" data-val="10">10%</span>
+        <span class="slider-tick" data-val="20">20%</span>
+        <span class="slider-tick" data-val="30">30%</span>
+        <span class="slider-tick" data-val="40">40%</span>
+        <span class="slider-tick" data-val="50">50%</span>
+      </div>
+      <div class="presets">
+        <button class="preset-btn" data-margin="5">5%</button>
+        <button class="preset-btn active" data-margin="8">8%</button>
+        <button class="preset-btn" data-margin="10">10%</button>
+        <button class="preset-btn" data-margin="12">12%</button>
+        <button class="preset-btn" data-margin="15">15%</button>
+        <button class="preset-btn" data-margin="20">20%</button>
+        <button class="preset-btn" data-margin="25">25%</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="results-card">
+    <div class="result-main">
+      <div class="result-label">Sell Price</div>
+      <div class="result-price empty" id="resultPrice">—</div>
+    </div>
+    <div class="breakdown">
+      <div class="breakdown-row">
+        <span class="breakdown-label">Lumber Cost</span>
+        <span class="breakdown-value" id="brkCost">—</span>
+      </div>
+      <div class="breakdown-row">
+        <span class="breakdown-label">Freight</span>
+        <span class="breakdown-value" id="brkFreight">—</span>
+      </div>
+      <hr class="breakdown-divider">
+      <div class="breakdown-row">
+        <span class="breakdown-label">Landed Cost</span>
+        <span class="breakdown-value" id="brkLanded">—</span>
+      </div>
+      <div class="breakdown-row margin-amount">
+        <span class="breakdown-label">Margin Amount</span>
+        <span class="breakdown-value" id="brkMargin">—</span>
+      </div>
+      <hr class="breakdown-divider">
+      <div class="breakdown-row total">
+        <span class="breakdown-label">Sell Price</span>
+        <span class="breakdown-value" id="brkTotal">—</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-text">LumberMargin.com</div>
+  </div>
+</div>
+
+<script>
+  const costInput = document.getElementById('costInput');
+  const freightInput = document.getElementById('freightInput');
+  const marginSlider = document.getElementById('marginSlider');
+  const marginDisplay = document.getElementById('marginDisplay');
+  const resultPrice = document.getElementById('resultPrice');
+  const brkCost = document.getElementById('brkCost');
+  const brkFreight = document.getElementById('brkFreight');
+  const brkLanded = document.getElementById('brkLanded');
+  const brkMargin = document.getElementById('brkMargin');
+  const brkTotal = document.getElementById('brkTotal');
+  const presetBtns = document.querySelectorAll('.preset-btn');
+  const sliderTicks = document.querySelectorAll('.slider-tick');
+
+  function formatInput(el) {
+    el.addEventListener('input', function() {
+      let val = this.value.replace(/[^0-9.]/g, '');
+      const parts = val.split('.');
+      if (parts.length > 2) val = parts[0] + '.' + parts.slice(1).join('');
+      this.value = val;
+      calculate();
+    });
+  }
+
+  formatInput(costInput);
+  formatInput(freightInput);
+
+  marginSlider.addEventListener('input', function() {
+    updateMarginDisplay(this.value);
+    updatePresetHighlight(this.value);
+    calculate();
+    updateSliderFill();
+  });
+
+  function updateSliderFill() {
+    const val = marginSlider.value;
+    const min = marginSlider.min;
+    const max = marginSlider.max;
+    const pct = ((val - min) / (max - min)) * 100;
+    marginSlider.style.background = `linear-gradient(to right, var(--accent) 0%, var(--accent) ${pct}%, var(--slider-track) ${pct}%, var(--slider-track) 100%)`;
+  }
+
+  function updateMarginDisplay(val) {
+    const num = parseFloat(val);
+    marginDisplay.textContent = (num % 1 === 0 ? num.toFixed(0) : num.toFixed(1)) + '%';
+  }
+
+  function updatePresetHighlight(val) {
+    const num = parseFloat(val);
+    presetBtns.forEach(btn => {
+      btn.classList.toggle('active', parseFloat(btn.dataset.margin) === num);
+    });
+  }
+
+  presetBtns.forEach(btn => {
+    btn.addEventListener('click', function() {
+      const val = this.dataset.margin;
+      marginSlider.value = val;
+      updateMarginDisplay(val);
+      updatePresetHighlight(val);
+      calculate();
+      updateSliderFill();
+    });
+  });
+
+  sliderTicks.forEach(tick => {
+    tick.addEventListener('click', function() {
+      const val = this.dataset.val;
+      marginSlider.value = val;
+      updateMarginDisplay(val);
+      updatePresetHighlight(val);
+      calculate();
+      updateSliderFill();
+    });
+  });
+
+  function fmt(num) {
+    const rounded = Math.round(num);
+    if (rounded >= 1000) {
+      return '$' + rounded.toLocaleString('en-US') + '/MBF';
+    }
+    return '$' + rounded + '/MBF';
+  }
+
+  function calculate() {
+    const cost = parseFloat(costInput.value) || 0;
+    const freight = parseFloat(freightInput.value) || 0;
+    const marginPct = parseFloat(marginSlider.value) || 0;
+
+    if (cost === 0 && freight === 0) {
+      resultPrice.innerHTML = '—';
+      resultPrice.classList.add('empty');
+      brkCost.textContent = '—';
+      brkFreight.textContent = '—';
+      brkLanded.textContent = '—';
+      brkMargin.textContent = '—';
+      brkTotal.textContent = '—';
+      return;
+    }
+
+    const landed = cost + freight;
+    const marginDecimal = marginPct / 100;
+
+    if (marginDecimal >= 1) {
+      resultPrice.innerHTML = '∞';
+      resultPrice.classList.remove('empty');
+      brkCost.textContent = fmt(cost);
+      brkFreight.textContent = fmt(freight);
+      brkLanded.textContent = fmt(landed);
+      brkMargin.textContent = '—';
+      brkTotal.textContent = '—';
+      return;
+    }
+
+    const sellPrice = landed / (1 - marginDecimal);
+    const marginAmt = sellPrice - landed;
+
+    const sellRounded = Math.round(sellPrice);
+    const sellFormatted = sellRounded >= 1000 ? '$' + sellRounded.toLocaleString('en-US') : '$' + sellRounded;
+    resultPrice.innerHTML = sellFormatted + '<span class="unit">/MBF</span>';
+    resultPrice.classList.remove('empty');
+
+    brkCost.textContent = fmt(cost);
+    brkFreight.textContent = fmt(freight);
+    brkLanded.textContent = fmt(landed);
+    brkMargin.textContent = '+' + fmt(marginAmt);
+    brkTotal.textContent = fmt(sellPrice);
+  }
+
+  updateSliderFill();
+  calculate();
+</script>
+
+</body>
+</html>
